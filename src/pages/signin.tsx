@@ -1,6 +1,6 @@
 import React from "react";
 import { useState } from "react";
-import { useSession, signIn, signOut } from "next-auth/react";
+import { useSession, signIn, signOut, getSession } from "next-auth/react";
 
 // export default function signin() {
 //   const [auth, setAuth] = useState({
@@ -50,19 +50,55 @@ import { useSession, signIn, signOut } from "next-auth/react";
 // }
 
 export default function Component() {
-  const { data: session } = useSession();
-  if (session) {
-    return (
-      <>
-        Signed in ! <br />
-        <button onClick={() => signOut()}>Sign out</button>
-      </>
-    );
-  }
+  // const { data: session } = useSession();
+  // if (session) {
+  //   return (
+  //     <div>
+  //       Signed in ! <br />
+  //       <button onClick={() => signOut()}>Sign out</button>
+  //     </div>
+  //   );
+  // }
+
+  const testFunc = async () => {
+    console.log("started testFunc");
+    let req = await fetch("http://localhost:3000/api/home");
+    console.log(req);
+  };
   return (
     <>
-      Not signed in <br />
-      <button onClick={() => signIn()}>Sign in</button>
+      <div
+        className="h-screen w-screen border border-sky-500
+        flex flex-col gap-10 items-center justify-center "
+      >
+        {/* <Link href="/signin">go signin</Link> */}
+        <h1 className="text-3xl font-bold underline">
+          Sign In Page if not logged in
+        </h1>
+        Not signed in <br />
+        <button onClick={() => signIn()}>Sign in</button>
+        <div>
+          <p>click some shit</p>
+          <button onClick={testFunc}>test</button>
+        </div>
+      </div>
     </>
   );
+}
+
+export async function getServerSideProps({ req }: any) {
+  const session = await getSession({ req });
+
+  if (session) {
+    return {
+      redirect: {
+        destination: "/",
+        permanent: false,
+      },
+    };
+  }
+
+  return {
+    props: { session },
+  };
 }
